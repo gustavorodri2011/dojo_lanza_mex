@@ -6,10 +6,33 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
+    "migrate-encryption": "node src/scripts/migrateEncryption.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["dojo", "karate", "cuotas", "backend"],
+  "keywords": [
+    "dojo",
+    "karate",
+    "cuotas",
+    "backend"
+  ],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.10.0"
+  "packageManager": "pnpm@10.10.0",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "crypto-js": "^4.2.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-validator": "^7.2.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.1",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^7.0.9",
+    "pg": "^8.16.3",
+    "pg-hstore": "^2.3.4",
+    "puppeteer": "^24.25.0",
+    "sequelize": "^6.37.7"
+  }
 }

@@ -1,21 +1,16 @@
 const { Member, Payment } = require('../models');
 const { Op } = require('sequelize');
+const { encrypt } = require('../utils/encryption');
 
 const getMembers = async (req, res) => {
   try {
     const { search, belt, active } = req.query;
     const where = {};
 
-    if (search) {
-      where[Op.or] = [
-        { firstName: { [Op.iLike]: `%${search}%` } },
-        { lastName: { [Op.iLike]: `%${search}%` } }
-      ];
-    }
     if (belt) where.belt = belt;
     if (active !== undefined) where.isActive = active === 'true';
 
-    const members = await Member.findAll({
+    let members = await Member.findAll({
       where,
       include: [{
         model: Payment,
@@ -23,8 +18,17 @@ const getMembers = async (req, res) => {
         limit: 1,
         order: [['paymentDate', 'DESC']]
       }],
-      order: [['lastName', 'ASC']]
+      order: [['id', 'ASC']]
     });
+
+    // Filtrar por búsqueda después de desencriptar
+    if (search) {
+      const searchLower = search.toLowerCase();
+      members = members.filter(member => 
+        member.firstName.toLowerCase().includes(searchLower) ||
+        member.lastName.toLowerCase().includes(searchLower)
+      );
+    }
 
     res.json(members);
   } catch (error) {
