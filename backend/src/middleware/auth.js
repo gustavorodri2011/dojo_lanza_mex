@@ -1,6 +1,13 @@
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 
+/**
+ * Middleware de autenticación JWT
+ * Verifica el token en el header Authorization y agrega el usuario a req.user
+ * @param {Object} req - Request object
+ * @param {Object} res - Response object
+ * @param {Function} next - Next middleware function
+ */
 const auth = async (req, res, next) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');

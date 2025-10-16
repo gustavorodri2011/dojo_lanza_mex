@@ -1,12 +1,25 @@
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 
+/**
+ * Genera un token JWT para el usuario
+ * @param {number} id - ID del usuario
+ * @returns {string} Token JWT firmado
+ */
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
 
+/**
+ * Autentica un usuario y devuelve token JWT
+ * @param {Object} req - Request object
+ * @param {string} req.body.username - Nombre de usuario
+ * @param {string} req.body.password - Contraseña
+ * @param {Object} res - Response object
+ * @returns {Object} Token JWT y datos del usuario
+ */
 const login = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -36,6 +49,12 @@ const login = async (req, res) => {
   }
 };
 
+/**
+ * Obtiene el perfil del usuario autenticado
+ * @param {Object} req - Request object (con req.user del middleware auth)
+ * @param {Object} res - Response object
+ * @returns {Object} Datos del usuario autenticado
+ */
 const getProfile = async (req, res) => {
   res.json({
     user: {

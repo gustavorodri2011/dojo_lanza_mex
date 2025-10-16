@@ -2,6 +2,15 @@ const { Member, Payment } = require('../models');
 const { Op } = require('sequelize');
 const { encrypt } = require('../utils/encryption');
 
+/**
+ * Obtiene lista de miembros con filtros opcionales
+ * @param {Object} req - Request object
+ * @param {string} req.query.search - Búsqueda por nombre o apellido
+ * @param {string} req.query.belt - Filtro por cinturón
+ * @param {string} req.query.active - Filtro por estado activo (true/false)
+ * @param {Object} res - Response object
+ * @returns {Array} Lista de miembros con sus pagos más recientes
+ */
 const getMembers = async (req, res) => {
   try {
     const { search, belt, active } = req.query;
@@ -36,6 +45,13 @@ const getMembers = async (req, res) => {
   }
 };
 
+/**
+ * Obtiene un miembro específico por ID
+ * @param {Object} req - Request object
+ * @param {string} req.params.id - ID del miembro
+ * @param {Object} res - Response object
+ * @returns {Object} Miembro con historial completo de pagos
+ */
 const getMember = async (req, res) => {
   try {
     const member = await Member.findByPk(req.params.id, {
@@ -56,6 +72,13 @@ const getMember = async (req, res) => {
   }
 };
 
+/**
+ * Crea un nuevo miembro
+ * @param {Object} req - Request object
+ * @param {Object} req.body - Datos del miembro (firstName, lastName, email, etc.)
+ * @param {Object} res - Response object
+ * @returns {Object} Miembro creado con datos encriptados automáticamente
+ */
 const createMember = async (req, res) => {
   try {
     const member = await Member.create(req.body);
@@ -65,6 +88,14 @@ const createMember = async (req, res) => {
   }
 };
 
+/**
+ * Actualiza un miembro existente
+ * @param {Object} req - Request object
+ * @param {string} req.params.id - ID del miembro
+ * @param {Object} req.body - Datos a actualizar
+ * @param {Object} res - Response object
+ * @returns {Object} Miembro actualizado con datos encriptados automáticamente
+ */
 const updateMember = async (req, res) => {
   try {
     const member = await Member.findByPk(req.params.id);
@@ -80,6 +111,13 @@ const updateMember = async (req, res) => {
   }
 };
 
+/**
+ * Elimina un miembro
+ * @param {Object} req - Request object
+ * @param {string} req.params.id - ID del miembro
+ * @param {Object} res - Response object
+ * @returns {Object} Mensaje de confirmación
+ */
 const deleteMember = async (req, res) => {
   try {
     const deleted = await Member.destroy({

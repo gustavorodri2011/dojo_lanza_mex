@@ -2,6 +2,15 @@ const { Payment, Member } = require('../models');
 const { Op } = require('sequelize');
 const { decrypt } = require('../utils/encryption');
 
+/**
+ * Obtiene lista de pagos con filtros opcionales
+ * @param {Object} req - Request object
+ * @param {string} req.query.memberId - Filtro por ID de miembro
+ * @param {string} req.query.month - Filtro por mes (01-12)
+ * @param {string} req.query.year - Filtro por año (YYYY)
+ * @param {Object} res - Response object
+ * @returns {Array} Lista de pagos con datos de miembros desencriptados
+ */
 const getPayments = async (req, res) => {
   try {
     const { memberId, month, year } = req.query;
@@ -35,6 +44,17 @@ const getPayments = async (req, res) => {
   }
 };
 
+/**
+ * Registra un nuevo pago
+ * @param {Object} req - Request object
+ * @param {number} req.body.memberId - ID del miembro
+ * @param {number} req.body.amount - Monto del pago
+ * @param {string} req.body.monthYear - Mes/año en formato YYYY-MM
+ * @param {string} req.body.paymentMethod - Método de pago (efectivo/transferencia/tarjeta)
+ * @param {string} req.body.notes - Notas opcionales
+ * @param {Object} res - Response object
+ * @returns {Object} Pago creado con datos del miembro
+ */
 const createPayment = async (req, res) => {
   try {
     const { memberId, amount, monthYear, paymentMethod, notes } = req.body;
@@ -72,6 +92,12 @@ const createPayment = async (req, res) => {
   }
 };
 
+/**
+ * Obtiene miembros con pagos atrasados del mes actual
+ * @param {Object} req - Request object
+ * @param {Object} res - Response object
+ * @returns {Array} Lista de miembros sin pago del mes actual
+ */
 const getOverdueMembers = async (req, res) => {
   try {
     const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
