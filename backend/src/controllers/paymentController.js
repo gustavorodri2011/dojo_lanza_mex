@@ -1,5 +1,6 @@
 const { Payment, Member } = require('../models');
 const { Op } = require('sequelize');
+const { decrypt } = require('../utils/encryption');
 
 const getPayments = async (req, res) => {
   try {
@@ -13,10 +14,19 @@ const getPayments = async (req, res) => {
       where,
       include: [{
         model: Member,
-        as: 'member',
-        attributes: ['firstName', 'lastName']
+        as: 'member'
       }],
       order: [['paymentDate', 'DESC']]
+    });
+
+    // Desencriptar manualmente los nombres de miembros
+    payments.forEach(payment => {
+      if (payment.member) {
+        payment.member.firstName = decrypt(payment.member.firstName);
+        payment.member.lastName = decrypt(payment.member.lastName);
+        payment.member.phone = decrypt(payment.member.phone);
+        payment.member.notes = decrypt(payment.member.notes);
+      }
     });
 
     res.json(payments);
@@ -44,10 +54,17 @@ const createPayment = async (req, res) => {
     const paymentWithMember = await Payment.findByPk(payment.id, {
       include: [{
         model: Member,
-        as: 'member',
-        attributes: ['firstName', 'lastName']
+        as: 'member'
       }]
     });
+
+    // Desencriptar manualmente los nombres del miembro
+    if (paymentWithMember.member) {
+      paymentWithMember.member.firstName = decrypt(paymentWithMember.member.firstName);
+      paymentWithMember.member.lastName = decrypt(paymentWithMember.member.lastName);
+      paymentWithMember.member.phone = decrypt(paymentWithMember.member.phone);
+      paymentWithMember.member.notes = decrypt(paymentWithMember.member.notes);
+    }
 
     res.status(201).json(paymentWithMember);
   } catch (error) {
