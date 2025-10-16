@@ -3,6 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const { connectDB } = require('./config/database');
+const { syncModels } = require('./models');
+const { createDefaultAdmin } = require('./config/seeder');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -34,6 +37,14 @@ app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-app.listen(PORT, () => {
-  console.log(`🥋 Dojo API running on port ${PORT}`);
-});
+const startServer = async () => {
+  await connectDB();
+  await syncModels();
+  await createDefaultAdmin();
+  
+  app.listen(PORT, () => {
+    console.log(`🥋 Dojo API running on port ${PORT}`);
+  });
+};
+
+startServer();
