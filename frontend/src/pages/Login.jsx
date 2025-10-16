@@ -1,24 +1,28 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useAlert } from '../hooks/useAlert';
 
 const Login = () => {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { showError } = useAlert();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
 
     try {
       await login(credentials);
       navigate('/dashboard');
     } catch (error) {
-      setError(error.response?.data?.message || 'Error al iniciar sesión');
+      console.error('Login error:', error);
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          'Error al iniciar sesión. Verifica tus credenciales.';
+      showError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -59,11 +63,7 @@ const Login = () => {
             />
           </div>
 
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
+
 
           <button
             type="submit"

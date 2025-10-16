@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { membersAPI } from '../services/api';
 import MemberForm from '../components/MemberForm';
+import { useAlert } from '../hooks/useAlert';
 
 const Members = () => {
   const [members, setMembers] = useState([]);
@@ -8,6 +9,7 @@ const Members = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
   const [search, setSearch] = useState('');
+  const { showSuccess, showError, showConfirm } = useAlert();
 
   useEffect(() => {
     fetchMembers();
@@ -28,14 +30,16 @@ const Members = () => {
     try {
       if (editingMember) {
         await membersAPI.update(editingMember.id, memberData);
+        showSuccess('Miembro actualizado correctamente');
       } else {
         await membersAPI.create(memberData);
+        showSuccess('Miembro creado correctamente');
       }
       setShowForm(false);
       setEditingMember(null);
       fetchMembers();
     } catch (error) {
-      console.error('Error saving member:', error);
+      showError(error.response?.data?.message || 'Error al guardar el miembro');
     }
   };
 
@@ -44,13 +48,19 @@ const Members = () => {
     setShowForm(true);
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('¿Estás seguro de eliminar este miembro?')) {
+  const handleDelete = async (id, memberName) => {
+    const confirmed = await showConfirm(
+      `Esta acción no se puede deshacer. Se eliminará el miembro "${memberName}" y todos sus datos.`,
+      '¿Eliminar miembro?'
+    );
+    
+    if (confirmed) {
       try {
         await membersAPI.delete(id);
+        showSuccess('Miembro eliminado correctamente');
         fetchMembers();
       } catch (error) {
-        console.error('Error deleting member:', error);
+        showError(error.response?.data?.message || 'Error al eliminar el miembro');
       }
     }
   };
@@ -130,7 +140,7 @@ const Members = () => {
                       Editar
                     </button>
                     <button
-                      onClick={() => handleDelete(member.id)}
+                      onClick={() => handleDelete(member.id, `${member.firstName} ${member.lastName}`)}
                       className="text-red-600 hover:text-red-900"
                     >
                       Eliminar

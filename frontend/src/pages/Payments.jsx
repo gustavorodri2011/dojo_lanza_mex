@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { paymentsAPI, membersAPI } from '../services/api';
 import PaymentForm from '../components/PaymentForm';
+import { useAlert } from '../hooks/useAlert';
 
 const Payments = () => {
   const [payments, setPayments] = useState([]);
@@ -8,6 +9,7 @@ const Payments = () => {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [selectedMember, setSelectedMember] = useState('');
+  const { showSuccess, showError } = useAlert();
 
   useEffect(() => {
     fetchData();
@@ -31,10 +33,11 @@ const Payments = () => {
   const handlePaymentSave = async (paymentData) => {
     try {
       await paymentsAPI.create(paymentData);
+      showSuccess('Pago registrado correctamente');
       setShowForm(false);
       fetchData();
     } catch (error) {
-      console.error('Error saving payment:', error);
+      showError(error.response?.data?.message || 'Error al registrar el pago');
     }
   };
 
