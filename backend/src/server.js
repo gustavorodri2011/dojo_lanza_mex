@@ -26,6 +26,10 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/members', require('./routes/members'));
+app.use('/api/payments', require('./routes/payments'));
+
 // Error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
