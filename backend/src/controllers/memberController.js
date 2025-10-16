@@ -67,15 +67,13 @@ const createMember = async (req, res) => {
 
 const updateMember = async (req, res) => {
   try {
-    const [updated] = await Member.update(req.body, {
-      where: { id: req.params.id }
-    });
-
-    if (!updated) {
+    const member = await Member.findByPk(req.params.id);
+    
+    if (!member) {
       return res.status(404).json({ message: 'Member not found' });
     }
 
-    const member = await Member.findByPk(req.params.id);
+    await member.update(req.body);
     res.json(member);
   } catch (error) {
     res.status(400).json({ message: error.message });
