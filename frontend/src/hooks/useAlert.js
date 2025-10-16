@@ -22,12 +22,11 @@ export const useAlert = () => {
   };
 
   const showError = (message, title = 'Error') => {
-    console.log('Showing error:', message, title);
     const Toast = Swal.mixin({
       toast: true,
       position: 'top-end',
       showConfirmButton: false,
-      timer: 4000,
+      timer: 6000,
       timerProgressBar: true,
       didOpen: (toast) => {
         toast.addEventListener('mouseenter', Swal.stopTimer);
