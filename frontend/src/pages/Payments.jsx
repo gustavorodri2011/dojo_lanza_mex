@@ -11,6 +11,27 @@ const Payments = () => {
   const [selectedMember, setSelectedMember] = useState('');
   const { showSuccess, showError } = useAlert();
 
+  const handleDownloadPDF = async (paymentId, receiptNumber) => {
+    try {
+      const response = await paymentsAPI.downloadReceipt(paymentId);
+      
+      // Crear blob y descargar
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `recibo-${receiptNumber}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      showSuccess('Recibo descargado correctamente');
+    } catch (error) {
+      showError('Error al generar el recibo PDF');
+    }
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -86,6 +107,7 @@ const Payments = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha Pago</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Método</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Recibo</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -112,6 +134,14 @@ const Payments = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {payment.receiptNumber}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button
+                      onClick={() => handleDownloadPDF(payment.id, payment.receiptNumber)}
+                      className="text-blue-600 hover:text-blue-900 bg-blue-100 hover:bg-blue-200 px-3 py-1 rounded-md transition duration-200"
+                    >
+                      📄 PDF
+                    </button>
                   </td>
                 </tr>
               ))}

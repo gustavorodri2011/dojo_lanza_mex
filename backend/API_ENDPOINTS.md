@@ -280,6 +280,24 @@ Obtiene miembros con pagos atrasados del mes actual.
 ]
 ```
 
+### GET /payments/:id/receipt
+Genera y descarga el recibo PDF de un pago específico.
+
+**Parameters:**
+- `id` (number): ID del pago
+
+**Response:**
+- Content-Type: `application/pdf`
+- Content-Disposition: `attachment; filename="recibo-{receiptNumber}.pdf"`
+- Body: Archivo PDF del recibo
+
+**Contenido del PDF:**
+- Encabezado del dojo
+- Información del miembro
+- Detalles del pago
+- Número de recibo
+- Fecha y monto
+
 ---
 
 ## 🏥 Health Check
@@ -330,3 +348,13 @@ Los siguientes campos se almacenan encriptados en la base de datos:
 ---
 
 **Última actualización:** 16 de Octubre, 2024
+
+## 📄 Generación de PDFs
+
+### Recibos de Pago
+Los recibos PDF incluyen:
+- Logo y nombre del dojo
+- Datos del miembro (desencriptados)
+- Información completa del pago
+- Número de recibo único
+- Formato profesional para impresión

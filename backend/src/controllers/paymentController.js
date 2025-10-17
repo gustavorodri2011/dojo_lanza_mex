@@ -1,6 +1,7 @@
 const { Payment, Member } = require('../models');
 const { Op } = require('sequelize');
 const { decrypt } = require('../utils/encryption');
+const { generateReceiptPDF: createReceiptPDF } = require('../services/pdfService');
 
 /**
  * Obtiene lista de pagos con filtros opcionales
@@ -122,8 +123,48 @@ const getOverdueMembers = async (req, res) => {
   }
 };
 
+/**
+ * Genera y descarga el PDF del recibo de pago
+ * @param {Object} req - Request object
+ * @param {string} req.params.id - ID del pago
+ * @param {Object} res - Response object
+ * @returns {Buffer} PDF del recibo
+ */
+const downloadReceiptPDF = async (req, res) => {
+  try {
+    const payment = await Payment.findByPk(req.params.id, {
+      include: [{
+        model: Member,
+        as: 'member'
+      }]
+    });
+
+    if (!payment) {
+      return res.status(404).json({ message: 'Payment not found' });
+    }
+
+    // Desencriptar manualmente los datos del miembro
+    if (payment.member) {
+      payment.member.firstName = decrypt(payment.member.firstName);
+      payment.member.lastName = decrypt(payment.member.lastName);
+      payment.member.phone = decrypt(payment.member.phone);
+      payment.member.notes = decrypt(payment.member.notes);
+    }
+
+    const pdfBuffer = createReceiptPDF(payment, payment.member);
+    
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="recibo-${payment.receiptNumber}.pdf"`);
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    res.status(500).json({ message: 'Error generating PDF' });
+  }
+};
+
 module.exports = {
   getPayments,
   createPayment,
-  getOverdueMembers
+  getOverdueMembers,
+  downloadReceiptPDF
 };

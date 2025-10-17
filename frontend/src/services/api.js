@@ -42,6 +42,7 @@ export const paymentsAPI = {
   getAll: (params) => api.get('/payments', { params }),
   create: (data) => api.post('/payments', data),
   getOverdue: () => api.get('/payments/overdue'),
+  downloadReceipt: (id) => api.get(`/payments/${id}/receipt`, { responseType: 'blob' }),
 };
 
 export default api;
