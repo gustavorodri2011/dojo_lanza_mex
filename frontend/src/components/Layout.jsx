@@ -8,7 +8,8 @@ const Layout = ({ children }) => {
   const navigation = [
     { name: 'Dashboard', href: '/dashboard' },
     { name: 'Miembros', href: '/members' },
-    { name: 'Pagos', href: '/payments' }
+    { name: 'Pagos', href: '/payments' },
+    { name: 'Alertas', href: '/alerts' }
   ];
 
   return (

@@ -45,4 +45,10 @@ export const paymentsAPI = {
   downloadReceipt: (id) => api.get(`/payments/${id}/receipt`, { responseType: 'blob' }),
 };
 
+export const alertsAPI = {
+  sendOverdueAlerts: () => api.post('/alerts/send-overdue'),
+  scheduleAlerts: (config) => api.post('/alerts/schedule', config),
+  testEmailConnection: () => api.get('/alerts/test-email'),
+};
+
 export default api;
