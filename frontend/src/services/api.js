@@ -58,4 +58,13 @@ export const statsAPI = {
   getPaymentMethodStats: () => api.get('/stats/payment-methods')
 };
 
+export const reportsAPI = {
+  getIncomeReport: (params) => api.get('/reports/income', { params }),
+  getMembersReport: (params) => api.get('/reports/members', { params }),
+  getOverdueReport: (params) => api.get('/reports/overdue', { params }),
+  downloadIncomeExcel: (params) => api.get('/reports/income', { params: { ...params, format: 'excel' }, responseType: 'blob' }),
+  downloadMembersExcel: (params) => api.get('/reports/members', { params: { ...params, format: 'excel' }, responseType: 'blob' }),
+  downloadOverdueExcel: (params) => api.get('/reports/overdue', { params: { ...params, format: 'excel' }, responseType: 'blob' })
+};
+
 export default api;

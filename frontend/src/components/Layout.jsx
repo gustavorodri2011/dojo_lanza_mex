@@ -11,7 +11,8 @@ const Layout = ({ children }) => {
     { name: 'Dashboard', href: '/dashboard' },
     { name: 'Miembros', href: '/members' },
     { name: 'Pagos', href: '/payments' },
-    { name: 'Alertas', href: '/alerts' }
+    { name: 'Alertas', href: '/alerts' },
+    { name: 'Reportes', href: '/reports' }
   ];
 
   return (
