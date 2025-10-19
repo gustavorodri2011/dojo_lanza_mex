@@ -16,8 +16,9 @@ const getDashboardStats = async (req, res) => {
     const totalMembers = await Member.count();
     const activeMembers = await Member.count({ where: { isActive: true } });
     
+    const monthYearStr = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
     const currentMonthPayments = await Payment.findAll({
-      where: { month: currentMonth, year: currentYear }
+      where: { monthYear: monthYearStr }
     });
     
     const paidMemberIds = currentMonthPayments.map(p => p.memberId);
@@ -52,8 +53,9 @@ const getMonthlyRevenue = async (req, res) => {
     const monthlyData = [];
 
     for (let month = 1; month <= 12; month++) {
+      const monthStr = `${currentYear}-${month.toString().padStart(2, '0')}`;
       const payments = await Payment.findAll({
-        where: { month, year: currentYear }
+        where: { monthYear: monthStr }
       });
       
       const revenue = payments.reduce((sum, p) => sum + parseFloat(p.amount), 0);
@@ -101,8 +103,9 @@ const getPaymentMethodStats = async (req, res) => {
     const currentMonth = new Date().getMonth() + 1;
     const currentYear = new Date().getFullYear();
 
+    const monthYearStr = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
     const payments = await Payment.findAll({
-      where: { month: currentMonth, year: currentYear },
+      where: { monthYear: monthYearStr },
       attributes: ['paymentMethod', 'amount']
     });
 
