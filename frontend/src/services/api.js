@@ -51,4 +51,11 @@ export const alertsAPI = {
   testEmailConnection: () => api.get('/alerts/test-email'),
 };
 
+export const statsAPI = {
+  getDashboardStats: () => api.get('/stats/dashboard'),
+  getMonthlyRevenue: () => api.get('/stats/monthly-revenue'),
+  getBeltDistribution: () => api.get('/stats/belt-distribution'),
+  getPaymentMethodStats: () => api.get('/stats/payment-methods')
+};
+
 export default api;

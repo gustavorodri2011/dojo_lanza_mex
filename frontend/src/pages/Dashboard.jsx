@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { paymentsAPI, membersAPI } from '../services/api';
+import { statsAPI, paymentsAPI } from '../services/api';
+import RevenueChart from '../components/charts/RevenueChart';
+import BeltChart from '../components/charts/BeltChart';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -9,29 +11,24 @@ const Dashboard = () => {
     monthlyRevenue: 0
   });
   const [overdueMembers, setOverdueMembers] = useState([]);
+  const [monthlyRevenue, setMonthlyRevenue] = useState([]);
+  const [beltDistribution, setBeltDistribution] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [membersRes, overdueRes, paymentsRes] = await Promise.all([
-          membersAPI.getAll(),
+        const [statsRes, overdueRes, revenueRes, beltRes] = await Promise.all([
+          statsAPI.getDashboardStats(),
           paymentsAPI.getOverdue(),
-          paymentsAPI.getAll({ month: new Date().getMonth() + 1, year: new Date().getFullYear() })
+          statsAPI.getMonthlyRevenue(),
+          statsAPI.getBeltDistribution()
         ]);
 
-        const members = membersRes.data;
-        const overdue = overdueRes.data;
-        const payments = paymentsRes.data;
-
-        setStats({
-          totalMembers: members.length,
-          activeMembers: members.filter(m => m.isActive).length,
-          overdueMembers: overdue.length,
-          monthlyRevenue: payments.reduce((sum, p) => sum + parseFloat(p.amount), 0)
-        });
-
-        setOverdueMembers(overdue);
+        setStats(statsRes.data);
+        setOverdueMembers(overdueRes.data);
+        setMonthlyRevenue(revenueRes.data);
+        setBeltDistribution(beltRes.data);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
       } finally {
@@ -71,6 +68,20 @@ const Dashboard = () => {
         <div className="bg-white rounded-lg shadow p-4 sm:p-6">
           <div className="text-xl sm:text-2xl font-bold text-purple-600">${stats.monthlyRevenue}</div>
           <div className="text-sm sm:text-base text-gray-600">Ingresos del Mes</div>
+        </div>
+      </div>
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+          <div className="h-64 sm:h-80">
+            <RevenueChart data={monthlyRevenue} />
+          </div>
+        </div>
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+          <div className="h-64 sm:h-80">
+            <BeltChart data={beltDistribution} />
+          </div>
         </div>
       </div>
 
