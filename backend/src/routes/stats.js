@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { authenticateToken } = require('../middleware/auth');
+const auth = require('../middleware/auth');
 const {
   getDashboardStats,
   getMonthlyRevenue,
@@ -8,9 +8,9 @@ const {
   getPaymentMethodStats
 } = require('../controllers/statsController');
 
-router.get('/dashboard', authenticateToken, getDashboardStats);
-router.get('/monthly-revenue', authenticateToken, getMonthlyRevenue);
-router.get('/belt-distribution', authenticateToken, getBeltDistribution);
-router.get('/payment-methods', authenticateToken, getPaymentMethodStats);
+router.get('/dashboard', auth, getDashboardStats);
+router.get('/monthly-revenue', auth, getMonthlyRevenue);
+router.get('/belt-distribution', auth, getBeltDistribution);
+router.get('/payment-methods', auth, getPaymentMethodStats);
 
 module.exports = router;
