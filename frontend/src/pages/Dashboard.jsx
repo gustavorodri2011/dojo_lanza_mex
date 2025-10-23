@@ -49,7 +49,7 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Dashboard</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Panel de Control</h1>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">

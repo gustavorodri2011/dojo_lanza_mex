@@ -33,6 +33,7 @@ app.use('/api/payments', require('./routes/payments'));
 app.use('/api/alerts', require('./routes/alerts'));
 app.use('/api/stats', require('./routes/stats'));
 app.use('/api/reports', require('./routes/reports'));
+app.use('/api/classes', require('./routes/classes'));
 
 // Error handling
 app.use((err, req, res, next) => {

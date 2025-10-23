@@ -67,4 +67,13 @@ export const reportsAPI = {
   downloadOverdueExcel: (params) => api.get('/reports/overdue', { params: { ...params, format: 'excel' }, responseType: 'blob' })
 };
 
+export const classesAPI = {
+  getAll: (params) => api.get('/classes', { params }),
+  create: (data) => api.post('/classes', data),
+  update: (id, data) => api.put(`/classes/${id}`, data),
+  delete: (id) => api.delete(`/classes/${id}`),
+  recordAttendance: (data) => api.post('/classes/attendance', data),
+  getAttendance: (params) => api.get('/classes/attendance', { params })
+};
+
 export default api;
