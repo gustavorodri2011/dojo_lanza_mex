@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { beltsAPI } from '../services/api';
 
 const MemberForm = ({ member, onSave, onCancel }) => {
+  const [belts, setBelts] = useState([]);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -8,17 +10,30 @@ const MemberForm = ({ member, onSave, onCancel }) => {
     phone: '',
     dateOfBirth: '',
     joinDate: new Date().toISOString().split('T')[0],
-    belt: 'blanco',
+    beltId: 1,
     isActive: true,
     notes: ''
   });
+
+  useEffect(() => {
+    const fetchBelts = async () => {
+      try {
+        const response = await beltsAPI.getAll();
+        setBelts(response.data);
+      } catch (error) {
+        console.error('Error loading belts:', error);
+      }
+    };
+    fetchBelts();
+  }, []);
 
   useEffect(() => {
     if (member) {
       setFormData({
         ...member,
         dateOfBirth: member.dateOfBirth || '',
-        joinDate: member.joinDate || new Date().toISOString().split('T')[0]
+        joinDate: member.joinDate || new Date().toISOString().split('T')[0],
+        beltId: member.beltId || 1
       });
     }
   }, [member]);
@@ -132,18 +147,14 @@ const MemberForm = ({ member, onSave, onCancel }) => {
               Cinturón
             </label>
             <select
-              name="belt"
-              value={formData.belt}
+              name="beltId"
+              value={formData.beltId}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="blanco">Blanco</option>
-              <option value="amarillo">Amarillo</option>
-              <option value="naranja">Naranja</option>
-              <option value="verde">Verde</option>
-              <option value="azul">Azul</option>
-              <option value="marron">Marrón</option>
-              <option value="negro">Negro</option>
+              {belts.map(belt => (
+                <option key={belt.id} value={belt.id}>{belt.name}</option>
+              ))}
             </select>
           </div>
 

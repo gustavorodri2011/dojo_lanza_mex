@@ -33,9 +33,14 @@ const Member = sequelize.define('Member', {
     allowNull: false,
     defaultValue: DataTypes.NOW
   },
-  belt: {
-    type: DataTypes.ENUM('blanco', 'amarillo', 'naranja', 'verde', 'azul', 'marron', 'negro'),
-    defaultValue: 'blanco'
+  beltId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 1,
+    references: {
+      model: 'belt_levels',
+      key: 'id'
+    }
   },
   isActive: {
     type: DataTypes.BOOLEAN,

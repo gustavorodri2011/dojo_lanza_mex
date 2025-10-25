@@ -113,8 +113,8 @@ const Members = () => {
               </div>
               <div className="flex justify-between items-center">
                 <div className="flex space-x-2">
-                  <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                    {member.belt}
+                  <span className="px-2 py-1 text-xs font-semibold rounded-full" style={{backgroundColor: member.belt?.color + '20', color: member.belt?.color}}>
+                    {member.belt?.name || 'Sin cinturón'}
                   </span>
                   <span className="text-xs text-gray-500">
                     {new Date(member.joinDate).toLocaleDateString()}
@@ -164,8 +164,8 @@ const Members = () => {
                     {member.email}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                      {member.belt}
+                    <span className="px-2 py-1 text-xs font-semibold rounded-full" style={{backgroundColor: member.belt?.color + '20', color: member.belt?.color}}>
+                      {member.belt?.name || 'Sin cinturón'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-500">

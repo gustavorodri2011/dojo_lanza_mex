@@ -1,4 +1,4 @@
-const { Member, Payment } = require('../models');
+const { Member, Payment, BeltLevel } = require('../models');
 const { Op } = require('sequelize');
 const { encrypt } = require('../utils/encryption');
 
@@ -13,22 +13,33 @@ const { encrypt } = require('../utils/encryption');
  */
 const getMembers = async (req, res) => {
   try {
+    console.log('🔍 Getting members with query:', req.query);
     const { search, belt, active } = req.query;
     const where = {};
 
-    if (belt) where.belt = belt;
+    if (belt) where.beltId = belt;
     if (active !== undefined) where.isActive = active === 'true';
+
+    console.log('📋 Where clause:', where);
 
     let members = await Member.findAll({
       where,
-      include: [{
-        model: Payment,
-        as: 'payments',
-        limit: 1,
-        order: [['paymentDate', 'DESC']]
-      }],
+      include: [
+        {
+          model: Payment,
+          as: 'payments',
+          limit: 1,
+          order: [['paymentDate', 'DESC']]
+        },
+        {
+          model: BeltLevel,
+          as: 'belt'
+        }
+      ],
       order: [['id', 'ASC']]
     });
+
+    console.log('👥 Found members:', members.length);
 
     // Filtrar por búsqueda después de desencriptar
     if (search) {
@@ -41,7 +52,8 @@ const getMembers = async (req, res) => {
 
     res.json(members);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('❌ Error in getMembers:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
@@ -55,11 +67,17 @@ const getMembers = async (req, res) => {
 const getMember = async (req, res) => {
   try {
     const member = await Member.findByPk(req.params.id, {
-      include: [{
-        model: Payment,
-        as: 'payments',
-        order: [['paymentDate', 'DESC']]
-      }]
+      include: [
+        {
+          model: Payment,
+          as: 'payments',
+          order: [['paymentDate', 'DESC']]
+        },
+        {
+          model: BeltLevel,
+          as: 'belt'
+        }
+      ]
     });
 
     if (!member) {

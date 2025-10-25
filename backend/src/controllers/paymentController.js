@@ -1,4 +1,4 @@
-const { Payment, Member } = require('../models');
+const { Payment, Member, BeltLevel } = require('../models');
 const { Op } = require('sequelize');
 const { decrypt } = require('../utils/encryption');
 const { generateReceiptPDF: createReceiptPDF } = require('../services/pdfService');
@@ -24,7 +24,11 @@ const getPayments = async (req, res) => {
       where,
       include: [{
         model: Member,
-        as: 'member'
+        as: 'member',
+        include: [{
+          model: BeltLevel,
+          as: 'belt'
+        }]
       }],
       order: [['paymentDate', 'DESC']]
     });
@@ -75,7 +79,11 @@ const createPayment = async (req, res) => {
     const paymentWithMember = await Payment.findByPk(payment.id, {
       include: [{
         model: Member,
-        as: 'member'
+        as: 'member',
+        include: [{
+          model: BeltLevel,
+          as: 'belt'
+        }]
       }]
     });
 
@@ -101,25 +109,37 @@ const createPayment = async (req, res) => {
  */
 const getOverdueMembers = async (req, res) => {
   try {
+    console.log('🔍 Getting overdue members...');
     const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+    console.log('📅 Current month:', currentMonth);
     
     const members = await Member.findAll({
       where: { isActive: true },
-      include: [{
-        model: Payment,
-        as: 'payments',
-        where: { monthYear: currentMonth },
-        required: false
-      }]
+      include: [
+        {
+          model: Payment,
+          as: 'payments',
+          where: { monthYear: currentMonth },
+          required: false
+        },
+        {
+          model: BeltLevel,
+          as: 'belt'
+        }
+      ]
     });
 
+    console.log('👥 Found members:', members.length);
+    
     const overdueMembers = members.filter(member => 
       member.payments.length === 0
     );
 
+    console.log('⚠️ Overdue members:', overdueMembers.length);
     res.json(overdueMembers);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('❌ Error in getOverdueMembers:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
@@ -135,7 +155,11 @@ const downloadReceiptPDF = async (req, res) => {
     const payment = await Payment.findByPk(req.params.id, {
       include: [{
         model: Member,
-        as: 'member'
+        as: 'member',
+        include: [{
+          model: BeltLevel,
+          as: 'belt'
+        }]
       }]
     });
 

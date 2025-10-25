@@ -1,4 +1,4 @@
-const { Class, Attendance, Member } = require('../models');
+const { Class, Attendance, Member, BeltLevel } = require('../models');
 const { decrypt } = require('../utils/encryption');
 
 /**
@@ -111,7 +111,11 @@ const getAttendance = async (req, res) => {
       include: [{
         model: Member,
         as: 'member',
-        attributes: ['id', 'firstName', 'lastName', 'email']
+        attributes: ['id', 'firstName', 'lastName', 'email'],
+        include: [{
+          model: BeltLevel,
+          as: 'belt'
+        }]
       }]
     });
 

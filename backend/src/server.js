@@ -5,7 +5,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const { connectDB } = require('./config/database');
 const { syncModels } = require('./models');
-const { createDefaultAdmin } = require('./config/seeder');
+const { runSeeders } = require('./config/seeder');
 const { initializeCronJobs } = require('./services/cronService');
 
 const app = express();
@@ -34,6 +34,8 @@ app.use('/api/alerts', require('./routes/alerts'));
 app.use('/api/stats', require('./routes/stats'));
 app.use('/api/reports', require('./routes/reports'));
 app.use('/api/classes', require('./routes/classes'));
+app.use('/api/graduations', require('./routes/graduations'));
+app.use('/api/belts', require('./routes/belts'));
 
 // Error handling
 app.use((err, req, res, next) => {
@@ -49,7 +51,7 @@ app.use((req, res) => {
 const startServer = async () => {
   await connectDB();
   await syncModels();
-  await createDefaultAdmin();
+  await runSeeders();
   
   app.listen(PORT, () => {
     console.log(`🥋 Dojo API running on port ${PORT}`);

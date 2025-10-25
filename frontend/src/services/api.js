@@ -76,4 +76,15 @@ export const classesAPI = {
   getAttendance: (params) => api.get('/classes/attendance', { params })
 };
 
+export const graduationsAPI = {
+  getAll: (params) => api.get('/graduations', { params }),
+  create: (data) => api.post('/graduations', data),
+  update: (id, data) => api.put(`/graduations/${id}`, data),
+  delete: (id) => api.delete(`/graduations/${id}`)
+};
+
+export const beltsAPI = {
+  getAll: () => api.get('/belts')
+};
+
 export default api;

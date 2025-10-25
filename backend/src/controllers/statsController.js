@@ -1,4 +1,4 @@
-const { Member, Payment } = require('../models');
+const { Member, Payment, BeltLevel } = require('../models');
 const { Op } = require('sequelize');
 const { decrypt } = require('../utils/encryption');
 
@@ -11,7 +11,6 @@ const getDashboardStats = async (req, res) => {
     const currentMonth = currentDate.getMonth() + 1;
     const currentYear = currentDate.getFullYear();
 
-    // Estadísticas básicas
     // Estadísticas básicas
     const totalMembers = await Member.count();
     const activeMembers = await Member.count({ where: { isActive: true } });
@@ -26,7 +25,11 @@ const getDashboardStats = async (req, res) => {
       where: {
         isActive: true,
         id: { [Op.notIn]: paidMemberIds.length > 0 ? paidMemberIds : [0] }
-      }
+      },
+      include: [{
+        model: BeltLevel,
+        as: 'belt'
+      }]
     });
 
     const monthlyRevenue = currentMonthPayments.reduce((sum, p) => sum + parseFloat(p.amount), 0);
@@ -80,11 +83,22 @@ const getBeltDistribution = async (req, res) => {
   try {
     const members = await Member.findAll({
       where: { isActive: true },
-      attributes: ['belt']
+      include: [{
+        model: BeltLevel,
+        as: 'belt',
+        attributes: ['name', 'color']
+      }]
     });
 
     const distribution = members.reduce((acc, member) => {
-      acc[member.belt] = (acc[member.belt] || 0) + 1;
+      const beltName = member.belt.name;
+      if (!acc[beltName]) {
+        acc[beltName] = {
+          count: 0,
+          color: member.belt.color
+        };
+      }
+      acc[beltName].count++;
       return acc;
     }, {});
 

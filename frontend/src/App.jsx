@@ -7,6 +7,7 @@ import Payments from './pages/Payments';
 import Alerts from './pages/Alerts';
 import Reports from './pages/Reports';
 import Classes from './pages/Classes';
+import Graduations from './pages/Graduations';
 import Layout from './components/Layout';
 
 const ProtectedRoute = ({ children }) => {
@@ -69,6 +70,13 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <Classes />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          <Route path="/graduations" element={
+            <ProtectedRoute>
+              <Layout>
+                <Graduations />
               </Layout>
             </ProtectedRoute>
           } />
