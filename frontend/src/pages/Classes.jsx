@@ -285,9 +285,9 @@ const Classes = () => {
 
       {/* Formulario de Clase */}
       {showForm && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-screen overflow-y-auto">
-            <form onSubmit={handleSave} className="p-6">
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-screen overflow-y-auto my-4">
+            <form onSubmit={handleSave} className="p-4 sm:p-6">
               <h2 className="text-lg font-semibold mb-4">
                 {editingClass ? 'Editar Clase' : 'Nueva Clase'}
               </h2>
@@ -315,7 +315,7 @@ const Classes = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Día</label>
                     <select
@@ -344,7 +344,7 @@ const Classes = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Hora Inicio</label>
                     <input
@@ -407,9 +407,9 @@ const Classes = () => {
 
       {/* Modal de Asistencia */}
       {showAttendance && selectedClass && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto">
-            <div className="p-6">
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-screen overflow-y-auto my-4">
+            <div className="p-4 sm:p-6">
               <h2 className="text-lg font-semibold mb-4">
                 Asistencia - {selectedClass.name}
               </h2>

@@ -52,14 +52,15 @@ const MemberForm = ({ member, onSave, onCancel }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-screen overflow-y-auto my-4">
+        <div className="p-4 sm:p-6">
         <h2 className="text-xl font-bold text-gray-800 mb-4">
           {member ? 'Editar Miembro' : 'Nuevo Miembro'}
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Nombre *
@@ -114,7 +115,7 @@ const MemberForm = ({ member, onSave, onCancel }) => {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Fecha Nacimiento
@@ -200,6 +201,7 @@ const MemberForm = ({ member, onSave, onCancel }) => {
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );
