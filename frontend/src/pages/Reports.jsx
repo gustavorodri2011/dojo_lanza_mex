@@ -1,11 +1,12 @@
-import { useState } from 'react';
-import { reportsAPI } from '../services/api';
+import { useState, useEffect } from 'react';
+import { reportsAPI, beltsAPI } from '../services/api';
 import { useAlert } from '../hooks/useAlert';
 
 const Reports = () => {
   const [loading, setLoading] = useState(false);
   const [reportData, setReportData] = useState(null);
   const [reportType, setReportType] = useState('income');
+  const [belts, setBelts] = useState([]);
   const [filters, setFilters] = useState({
     startDate: '',
     endDate: '',
@@ -13,6 +14,19 @@ const Reports = () => {
     status: ''
   });
   const { showSuccess, showError } = useAlert();
+
+  useEffect(() => {
+    fetchBelts();
+  }, []);
+
+  const fetchBelts = async () => {
+    try {
+      const response = await beltsAPI.getAll();
+      setBelts(response.data);
+    } catch (error) {
+      console.error('Error loading belts:', error);
+    }
+  };
 
   const handleGenerateReport = async () => {
     setLoading(true);
@@ -136,13 +150,9 @@ const Reports = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Todos los cinturones</option>
-                <option value="Blanco">Blanco</option>
-                <option value="Amarillo">Amarillo</option>
-                <option value="Naranja">Naranja</option>
-                <option value="Verde">Verde</option>
-                <option value="Azul">Azul</option>
-                <option value="Marrón">Marrón</option>
-                <option value="Negro">Negro</option>
+                {belts.map(belt => (
+                  <option key={belt.id} value={belt.id}>{belt.name}</option>
+                ))}
               </select>
             </div>
             <div>
