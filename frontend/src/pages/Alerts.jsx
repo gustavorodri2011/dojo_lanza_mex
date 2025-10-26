@@ -1,17 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAlert } from '../hooks/useAlert';
-import { alertsAPI } from '../services/api';
+import { alertsAPI, paymentsAPI } from '../services/api';
 
 const Alerts = () => {
   const [loading, setLoading] = useState(false);
+  const [overdueCount, setOverdueCount] = useState(0);
   const [alertConfig, setAlertConfig] = useState({
     enabled: false
   });
-  const { showSuccess, showError, showConfirm } = useAlert();
+  const { showSuccess, showError, showConfirmSend } = useAlert();
+
+  useEffect(() => {
+    fetchOverdueCount();
+  }, []);
+
+  const fetchOverdueCount = async () => {
+    try {
+      const response = await paymentsAPI.getOverdue();
+      setOverdueCount(response.data.length);
+    } catch (error) {
+      console.error('Error fetching overdue count:', error);
+    }
+  };
 
   const handleSendOverdueAlerts = async () => {
-    const confirmed = await showConfirm(
-      'Se enviarán emails a todos los miembros con pagos atrasados del mes actual. ¿Continuar?',
+    if (overdueCount === 0) {
+      showSuccess('¡Excelente! No hay miembros con pagos atrasados este mes', '✅ Todo al día');
+      return;
+    }
+
+    const confirmed = await showConfirmSend(
+      `Se enviarán emails a ${overdueCount} miembros con pagos atrasados del mes actual. ¿Continuar?`,
       'Enviar alertas de pagos atrasados'
     );
 
@@ -25,6 +44,7 @@ const Alerts = () => {
       showSuccess(
         `Alertas procesadas: ${sent} enviadas, ${failed} fallidas, ${noEmail} sin email de ${totalOverdue} miembros atrasados`
       );
+      fetchOverdueCount();
     } catch (error) {
       showError(error.response?.data?.message || 'Error al enviar alertas');
     } finally {
@@ -67,9 +87,21 @@ const Alerts = () => {
       {/* Envío manual de alertas */}
       <div className="bg-white rounded-lg shadow p-4 sm:p-6">
         <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4">Envío Manual de Alertas</h2>
-        <p className="text-sm sm:text-base text-gray-600 mb-6">
-          Envía recordatorios por email a todos los miembros que tienen pagos atrasados del mes actual.
-        </p>
+        <div className="mb-6">
+          <p className="text-sm sm:text-base text-gray-600 mb-3">
+            Envía recordatorios por email a todos los miembros que tienen pagos atrasados del mes actual.
+          </p>
+          <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+            overdueCount === 0 
+              ? 'bg-green-100 text-green-800' 
+              : 'bg-orange-100 text-orange-800'
+          }`}>
+            {overdueCount === 0 
+              ? '✅ Sin pagos atrasados' 
+              : `⚠️ ${overdueCount} pagos atrasados`
+            }
+          </div>
+        </div>
         
         <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
           <button
@@ -77,7 +109,7 @@ const Alerts = () => {
             disabled={loading}
             className="bg-orange-600 hover:bg-orange-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition duration-200 disabled:opacity-50 text-sm sm:text-base"
           >
-            {loading ? 'Enviando...' : '📧 Enviar Alertas de Pagos Atrasados'}
+            {loading ? 'Enviando...' : `📧 Enviar Alertas${overdueCount > 0 ? ` (${overdueCount})` : ''}`}
           </button>
           
           <button

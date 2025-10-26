@@ -75,9 +75,43 @@ export const useAlert = () => {
     return result.isConfirmed;
   };
 
+  const showConfirmSend = async (message, title = '¿Continuar?') => {
+    const result = await Swal.fire({
+      title: title,
+      text: message,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#ea580c',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Sí, enviar',
+      cancelButtonText: 'Cancelar',
+      buttonsStyling: false,
+      reverseButtons: true,
+      customClass: {
+        confirmButton: 'swal-confirm-send-btn',
+        cancelButton: 'swal-cancel-btn'
+      },
+      didOpen: () => {
+        const confirmBtn = document.querySelector('.swal-confirm-send-btn');
+        const cancelBtn = document.querySelector('.swal-cancel-btn');
+        
+        if (confirmBtn) {
+          confirmBtn.style.cssText = 'background-color: #ea580c !important; color: white !important; border: none !important; padding: 10px 20px !important; margin: 0 5px !important; border-radius: 6px !important; font-weight: 500 !important; cursor: pointer !important;';
+        }
+        
+        if (cancelBtn) {
+          cancelBtn.style.cssText = 'background-color: #6b7280 !important; color: white !important; border: none !important; padding: 10px 20px !important; margin: 0 5px !important; border-radius: 6px !important; font-weight: 500 !important; cursor: pointer !important;';
+        }
+      }
+    });
+
+    return result.isConfirmed;
+  };
+
   return {
     showSuccess,
     showError,
-    showConfirm
+    showConfirm,
+    showConfirmSend
   };
 };
