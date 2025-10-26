@@ -1,4 +1,4 @@
-const { Member, Payment } = require('../models');
+const { Member, Payment, BeltLevel } = require('../models');
 const { Op } = require('sequelize');
 const { decrypt } = require('../utils/encryption');
 const XLSX = require('xlsx');
@@ -77,16 +77,22 @@ const getMembersReport = async (req, res) => {
     const { belt, status, format = 'json' } = req.query;
     
     const whereClause = {};
-    if (belt) whereClause.belt = belt;
+    if (belt) whereClause.beltId = belt;
     if (status) whereClause.isActive = status === 'active';
 
     const members = await Member.findAll({
       where: whereClause,
-      include: [{
-        model: Payment,
-        as: 'payments',
-        required: false
-      }],
+      include: [
+        {
+          model: Payment,
+          as: 'payments',
+          required: false
+        },
+        {
+          model: BeltLevel,
+          as: 'belt'
+        }
+      ],
       order: [['joinDate', 'DESC']]
     });
 
@@ -99,7 +105,7 @@ const getMembersReport = async (req, res) => {
       phone: decrypt(member.phone),
       dateOfBirth: member.dateOfBirth,
       joinDate: member.joinDate,
-      belt: member.belt,
+      belt: member.belt?.name || 'Sin cinturón',
       isActive: member.isActive,
       totalPayments: member.payments.length,
       lastPayment: member.payments.length > 0 ? 
@@ -171,7 +177,7 @@ const getOverdueReport = async (req, res) => {
       lastName: decrypt(member.lastName),
       email: member.email,
       phone: decrypt(member.phone),
-      belt: member.belt,
+      belt: member.belt?.name || 'Sin cinturón',
       joinDate: member.joinDate,
       lastPayment: member.payments.length > 0 ? member.payments[0].paymentDate : null,
       daysSinceLastPayment: member.payments.length > 0 ? 
