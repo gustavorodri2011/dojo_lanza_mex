@@ -1,6 +1,7 @@
-const { Payment, Member } = require('../models');
+const { Payment, Member, BeltLevel } = require('../models');
 const { Op } = require('sequelize');
 const { decrypt } = require('../utils/encryption');
+const { generateReceiptPDF: createReceiptPDF } = require('../services/pdfService');
 
 /**
  * Obtiene lista de pagos con filtros opcionales
@@ -23,7 +24,11 @@ const getPayments = async (req, res) => {
       where,
       include: [{
         model: Member,
-        as: 'member'
+        as: 'member',
+        include: [{
+          model: BeltLevel,
+          as: 'belt'
+        }]
       }],
       order: [['paymentDate', 'DESC']]
     });
@@ -74,7 +79,11 @@ const createPayment = async (req, res) => {
     const paymentWithMember = await Payment.findByPk(payment.id, {
       include: [{
         model: Member,
-        as: 'member'
+        as: 'member',
+        include: [{
+          model: BeltLevel,
+          as: 'belt'
+        }]
       }]
     });
 
@@ -100,30 +109,86 @@ const createPayment = async (req, res) => {
  */
 const getOverdueMembers = async (req, res) => {
   try {
+    console.log('🔍 Getting overdue members...');
     const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+    console.log('📅 Current month:', currentMonth);
     
     const members = await Member.findAll({
       where: { isActive: true },
-      include: [{
-        model: Payment,
-        as: 'payments',
-        where: { monthYear: currentMonth },
-        required: false
-      }]
+      include: [
+        {
+          model: Payment,
+          as: 'payments',
+          where: { monthYear: currentMonth },
+          required: false
+        },
+        {
+          model: BeltLevel,
+          as: 'belt'
+        }
+      ]
     });
 
+    console.log('👥 Found members:', members.length);
+    
     const overdueMembers = members.filter(member => 
       member.payments.length === 0
     );
 
+    console.log('⚠️ Overdue members:', overdueMembers.length);
     res.json(overdueMembers);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('❌ Error in getOverdueMembers:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+/**
+ * Genera y descarga el PDF del recibo de pago
+ * @param {Object} req - Request object
+ * @param {string} req.params.id - ID del pago
+ * @param {Object} res - Response object
+ * @returns {Buffer} PDF del recibo
+ */
+const downloadReceiptPDF = async (req, res) => {
+  try {
+    const payment = await Payment.findByPk(req.params.id, {
+      include: [{
+        model: Member,
+        as: 'member',
+        include: [{
+          model: BeltLevel,
+          as: 'belt'
+        }]
+      }]
+    });
+
+    if (!payment) {
+      return res.status(404).json({ message: 'Payment not found' });
+    }
+
+    // Desencriptar manualmente los datos del miembro
+    if (payment.member) {
+      payment.member.firstName = decrypt(payment.member.firstName);
+      payment.member.lastName = decrypt(payment.member.lastName);
+      payment.member.phone = decrypt(payment.member.phone);
+      payment.member.notes = decrypt(payment.member.notes);
+    }
+
+    const pdfBuffer = createReceiptPDF(payment, payment.member);
+    
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="recibo-${payment.receiptNumber}.pdf"`);
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    res.status(500).json({ message: 'Error generating PDF' });
   }
 };
 
 module.exports = {
   getPayments,
   createPayment,
-  getOverdueMembers
+  getOverdueMembers,
+  downloadReceiptPDF
 };

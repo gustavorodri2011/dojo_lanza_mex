@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { beltsAPI } from '../services/api';
 
 const MemberForm = ({ member, onSave, onCancel }) => {
+  const [belts, setBelts] = useState([]);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -8,17 +10,30 @@ const MemberForm = ({ member, onSave, onCancel }) => {
     phone: '',
     dateOfBirth: '',
     joinDate: new Date().toISOString().split('T')[0],
-    belt: 'blanco',
+    beltId: 1,
     isActive: true,
     notes: ''
   });
+
+  useEffect(() => {
+    const fetchBelts = async () => {
+      try {
+        const response = await beltsAPI.getAll();
+        setBelts(response.data);
+      } catch (error) {
+        console.error('Error loading belts:', error);
+      }
+    };
+    fetchBelts();
+  }, []);
 
   useEffect(() => {
     if (member) {
       setFormData({
         ...member,
         dateOfBirth: member.dateOfBirth || '',
-        joinDate: member.joinDate || new Date().toISOString().split('T')[0]
+        joinDate: member.joinDate || new Date().toISOString().split('T')[0],
+        beltId: member.beltId || 1
       });
     }
   }, [member]);
@@ -37,14 +52,15 @@ const MemberForm = ({ member, onSave, onCancel }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-screen overflow-y-auto my-4">
+        <div className="p-4 sm:p-6">
         <h2 className="text-xl font-bold text-gray-800 mb-4">
           {member ? 'Editar Miembro' : 'Nuevo Miembro'}
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Nombre *
@@ -99,7 +115,7 @@ const MemberForm = ({ member, onSave, onCancel }) => {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Fecha Nacimiento
@@ -132,18 +148,14 @@ const MemberForm = ({ member, onSave, onCancel }) => {
               Cinturón
             </label>
             <select
-              name="belt"
-              value={formData.belt}
+              name="beltId"
+              value={formData.beltId}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="blanco">Blanco</option>
-              <option value="amarillo">Amarillo</option>
-              <option value="naranja">Naranja</option>
-              <option value="verde">Verde</option>
-              <option value="azul">Azul</option>
-              <option value="marron">Marrón</option>
-              <option value="negro">Negro</option>
+              {belts.map(belt => (
+                <option key={belt.id} value={belt.id}>{belt.name}</option>
+              ))}
             </select>
           </div>
 
@@ -189,6 +201,7 @@ const MemberForm = ({ member, onSave, onCancel }) => {
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );

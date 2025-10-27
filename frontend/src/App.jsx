@@ -4,6 +4,12 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Members from './pages/Members';
 import Payments from './pages/Payments';
+import Alerts from './pages/Alerts';
+import Reports from './pages/Reports';
+import Classes from './pages/Classes';
+import Graduations from './pages/Graduations';
+import QRCheckin from './pages/QRCheckin';
+import MemberQR from './pages/MemberQR';
 import Layout from './components/Layout';
 
 const ProtectedRoute = ({ children }) => {
@@ -45,6 +51,48 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <Payments />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          <Route path="/alerts" element={
+            <ProtectedRoute>
+              <Layout>
+                <Alerts />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          <Route path="/reports" element={
+            <ProtectedRoute>
+              <Layout>
+                <Reports />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          <Route path="/classes" element={
+            <ProtectedRoute>
+              <Layout>
+                <Classes />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          <Route path="/graduations" element={
+            <ProtectedRoute>
+              <Layout>
+                <Graduations />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          <Route path="/qr-checkin" element={
+            <ProtectedRoute>
+              <Layout>
+                <QRCheckin />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          <Route path="/member-qr" element={
+            <ProtectedRoute>
+              <Layout>
+                <MemberQR />
               </Layout>
             </ProtectedRoute>
           } />

@@ -5,7 +5,8 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const { connectDB } = require('./config/database');
 const { syncModels } = require('./models');
-const { createDefaultAdmin } = require('./config/seeder');
+const { runSeeders } = require('./config/seeder');
+const { initializeCronJobs } = require('./services/cronService');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -29,6 +30,13 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/members', require('./routes/members'));
 app.use('/api/payments', require('./routes/payments'));
+app.use('/api/alerts', require('./routes/alerts'));
+app.use('/api/stats', require('./routes/stats'));
+app.use('/api/reports', require('./routes/reports'));
+app.use('/api/classes', require('./routes/classes'));
+app.use('/api/graduations', require('./routes/graduations'));
+app.use('/api/belts', require('./routes/belts'));
+app.use('/api/qr', require('./routes/qr'));
 
 // Error handling
 app.use((err, req, res, next) => {
@@ -44,11 +52,20 @@ app.use((req, res) => {
 const startServer = async () => {
   await connectDB();
   await syncModels();
-  await createDefaultAdmin();
+  await runSeeders();
   
   app.listen(PORT, () => {
     console.log(`🥋 Dojo API running on port ${PORT}`);
+    initializeCronJobs();
   });
 };
+
+// Manejo de cierre graceful
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, stopping cron jobs...');
+  const { stopAllCronJobs } = require('./services/cronService');
+  stopAllCronJobs();
+  process.exit(0);
+});
 
 startServer();

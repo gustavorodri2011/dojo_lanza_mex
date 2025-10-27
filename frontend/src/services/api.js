@@ -42,6 +42,54 @@ export const paymentsAPI = {
   getAll: (params) => api.get('/payments', { params }),
   create: (data) => api.post('/payments', data),
   getOverdue: () => api.get('/payments/overdue'),
+  downloadReceipt: (id) => api.get(`/payments/${id}/receipt`, { responseType: 'blob' }),
+};
+
+export const alertsAPI = {
+  sendOverdueAlerts: () => api.post('/alerts/send-overdue'),
+  scheduleAlerts: (config) => api.post('/alerts/schedule', config),
+  testEmailConnection: () => api.get('/alerts/test-email'),
+};
+
+export const statsAPI = {
+  getDashboardStats: () => api.get('/stats/dashboard'),
+  getMonthlyRevenue: () => api.get('/stats/monthly-revenue'),
+  getBeltDistribution: () => api.get('/stats/belt-distribution'),
+  getPaymentMethodStats: () => api.get('/stats/payment-methods')
+};
+
+export const reportsAPI = {
+  getIncomeReport: (params) => api.get('/reports/income', { params }),
+  getMembersReport: (params) => api.get('/reports/members', { params }),
+  getOverdueReport: (params) => api.get('/reports/overdue', { params }),
+  downloadIncomeExcel: (params) => api.get('/reports/income', { params: { ...params, format: 'excel' }, responseType: 'blob' }),
+  downloadMembersExcel: (params) => api.get('/reports/members', { params: { ...params, format: 'excel' }, responseType: 'blob' }),
+  downloadOverdueExcel: (params) => api.get('/reports/overdue', { params: { ...params, format: 'excel' }, responseType: 'blob' })
+};
+
+export const classesAPI = {
+  getAll: (params) => api.get('/classes', { params }),
+  create: (data) => api.post('/classes', data),
+  update: (id, data) => api.put(`/classes/${id}`, data),
+  delete: (id) => api.delete(`/classes/${id}`),
+  recordAttendance: (data) => api.post('/classes/attendance', data),
+  getAttendance: (params) => api.get('/classes/attendance', { params })
+};
+
+export const graduationsAPI = {
+  getAll: (params) => api.get('/graduations', { params }),
+  create: (data) => api.post('/graduations', data),
+  update: (id, data) => api.put(`/graduations/${id}`, data),
+  delete: (id) => api.delete(`/graduations/${id}`)
+};
+
+export const beltsAPI = {
+  getAll: () => api.get('/belts')
+};
+
+export const qrAPI = {
+  generateMemberQR: (memberId) => api.get(`/qr/member/${memberId}`),
+  processCheckin: (data) => api.post('/qr/checkin', data)
 };
 
 export default api;

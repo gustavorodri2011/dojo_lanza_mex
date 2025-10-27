@@ -11,6 +11,27 @@ const Payments = () => {
   const [selectedMember, setSelectedMember] = useState('');
   const { showSuccess, showError } = useAlert();
 
+  const handleDownloadPDF = async (paymentId, receiptNumber) => {
+    try {
+      const response = await paymentsAPI.downloadReceipt(paymentId);
+      
+      // Crear blob y descargar
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `recibo-${receiptNumber}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      showSuccess('Recibo descargado correctamente');
+    } catch (error) {
+      showError('Error al generar el recibo PDF');
+    }
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -46,26 +67,26 @@ const Payments = () => {
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   };
 
-  if (loading) return <div className="text-center py-8">Cargando...</div>;
+  if (loading) return <div className="text-center py-4 sm:py-8 text-sm sm:text-base">Cargando...</div>;
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-800">Gestión de Pagos</h1>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Gestión de Pagos</h1>
         <button
           onClick={() => setShowForm(true)}
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm sm:text-base"
         >
-          Registrar Pago
+          + Registrar Pago
         </button>
       </div>
 
       <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b">
+        <div className="p-4 sm:p-6 border-b">
           <select
             value={selectedMember}
             onChange={(e) => setSelectedMember(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
           >
             <option value="">Todos los miembros</option>
             {members.map(member => (
@@ -76,7 +97,36 @@ const Payments = () => {
           </select>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Mobile Card View */}
+        <div className="block sm:hidden">
+          {payments.map((payment) => (
+            <div key={payment.id} className="border-b border-gray-200 p-4">
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <div className="font-medium text-gray-900 text-sm">
+                    {payment.member?.firstName} {payment.member?.lastName}
+                  </div>
+                  <div className="text-lg font-bold text-green-600">${payment.amount}</div>
+                </div>
+                <button
+                  onClick={() => handleDownloadPDF(payment.id, payment.receiptNumber)}
+                  className="text-blue-600 hover:text-blue-900 bg-blue-100 hover:bg-blue-200 px-2 py-1 rounded text-xs"
+                >
+                  📄 PDF
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                <div>Período: {payment.monthYear}</div>
+                <div>Fecha: {new Date(payment.paymentDate).toLocaleDateString()}</div>
+                <div>Método: {payment.paymentMethod}</div>
+                <div>Recibo: {payment.receiptNumber}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -86,6 +136,7 @@ const Payments = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha Pago</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Método</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Recibo</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -112,6 +163,14 @@ const Payments = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {payment.receiptNumber}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button
+                      onClick={() => handleDownloadPDF(payment.id, payment.receiptNumber)}
+                      className="text-blue-600 hover:text-blue-900 bg-blue-100 hover:bg-blue-200 px-3 py-1 rounded-md transition duration-200"
+                    >
+                      📄 PDF
+                    </button>
                   </td>
                 </tr>
               ))}

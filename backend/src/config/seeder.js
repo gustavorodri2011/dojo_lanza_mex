@@ -1,4 +1,5 @@
 const { User } = require('../models');
+const { seedBeltLevels } = require('./beltSeeder');
 
 const createDefaultAdmin = async () => {
   try {
@@ -17,4 +18,9 @@ const createDefaultAdmin = async () => {
   }
 };
 
-module.exports = { createDefaultAdmin };
+const runSeeders = async () => {
+  await seedBeltLevels();
+  await createDefaultAdmin();
+};
+
+module.exports = { createDefaultAdmin, runSeeders };

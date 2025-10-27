@@ -3,7 +3,8 @@ const { body } = require('express-validator');
 const {
   getPayments,
   createPayment,
-  getOverdueMembers
+  getOverdueMembers,
+  downloadReceiptPDF
 } = require('../controllers/paymentController');
 const auth = require('../middleware/auth');
 
@@ -20,5 +21,6 @@ router.use(auth);
 router.get('/', getPayments);
 router.post('/', paymentValidation, createPayment);
 router.get('/overdue', getOverdueMembers);
+router.get('/:id/receipt', downloadReceiptPDF);
 
 module.exports = router;
