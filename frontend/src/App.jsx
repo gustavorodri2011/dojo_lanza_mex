@@ -8,6 +8,8 @@ import Alerts from './pages/Alerts';
 import Reports from './pages/Reports';
 import Classes from './pages/Classes';
 import Graduations from './pages/Graduations';
+import QRCheckin from './pages/QRCheckin';
+import MemberQR from './pages/MemberQR';
 import Layout from './components/Layout';
 
 const ProtectedRoute = ({ children }) => {
@@ -77,6 +79,20 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <Graduations />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          <Route path="/qr-checkin" element={
+            <ProtectedRoute>
+              <Layout>
+                <QRCheckin />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          <Route path="/member-qr" element={
+            <ProtectedRoute>
+              <Layout>
+                <MemberQR />
               </Layout>
             </ProtectedRoute>
           } />

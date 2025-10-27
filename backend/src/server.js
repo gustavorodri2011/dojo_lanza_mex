@@ -36,6 +36,7 @@ app.use('/api/reports', require('./routes/reports'));
 app.use('/api/classes', require('./routes/classes'));
 app.use('/api/graduations', require('./routes/graduations'));
 app.use('/api/belts', require('./routes/belts'));
+app.use('/api/qr', require('./routes/qr'));
 
 // Error handling
 app.use((err, req, res, next) => {

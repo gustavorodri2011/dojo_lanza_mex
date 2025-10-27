@@ -13,6 +13,8 @@ const Layout = ({ children }) => {
     { name: 'Pagos', href: '/payments' },
     { name: 'Clases', href: '/classes' },
     { name: 'Graduaciones', href: '/graduations' },
+    { name: 'QR Check-in', href: '/qr-checkin' },
+    { name: 'QR Miembros', href: '/member-qr' },
     { name: 'Alertas', href: '/alerts' },
     { name: 'Reportes', href: '/reports' }
   ];
@@ -26,32 +28,8 @@ const Layout = ({ children }) => {
               <h1 className="text-lg sm:text-xl font-semibold text-gray-800">🥋 Dojo Manager</h1>
             </div>
             
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-4">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition duration-200 ${
-                    location.pathname === item.href
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              ))}
-              <span className="text-gray-600 text-sm">Hola, {user?.username}</span>
-              <button
-                onClick={logout}
-                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-sm transition duration-200"
-              >
-                Salir
-              </button>
-            </div>
-
-            {/* Mobile menu button */}
-            <div className="md:hidden flex items-center">
+            {/* Mobile menu button - Always visible */}
+            <div className="flex items-center">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="text-gray-600 hover:text-gray-900 p-2"
@@ -67,9 +45,9 @@ const Layout = ({ children }) => {
             </div>
           </div>
 
-          {/* Mobile Navigation */}
+          {/* Mobile Navigation - Always mobile style */}
           {mobileMenuOpen && (
-            <div className="md:hidden border-t border-gray-200">
+            <div className="border-t border-gray-200">
               <div className="px-2 pt-2 pb-3 space-y-1">
                 {navigation.map((item) => (
                   <Link

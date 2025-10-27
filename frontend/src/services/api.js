@@ -87,4 +87,9 @@ export const beltsAPI = {
   getAll: () => api.get('/belts')
 };
 
+export const qrAPI = {
+  generateMemberQR: (memberId) => api.get(`/qr/member/${memberId}`),
+  processCheckin: (data) => api.post('/qr/checkin', data)
+};
+
 export default api;
